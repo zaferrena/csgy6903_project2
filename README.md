@@ -1,6 +1,6 @@
 # csgy6903_project2
 
-- pip install crpyptography
+- pip install crypptography
 
 - turn off less secure apps setting (Manage your Google Account > Security > Less Secure App Access - Turn On)
 
