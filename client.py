@@ -66,7 +66,7 @@ if result == 'OK':
         encodedString = literal_eval("{}".format(message))
         cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
         decryptor = cipher.decryptor()
-        pt = decryptor.update(decodedString) + decryptor.finalize()
+        pt = decryptor.update(encodedString) + decryptor.finalize()
         print('Date:' + email_message['Date'])
         plaintext_str = pt.decode('latin-1')
         print(plaintext_str)
