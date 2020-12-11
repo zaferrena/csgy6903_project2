@@ -13,8 +13,8 @@ def int_from_bytes(xbytes: bytes) -> int:
     return int.from_bytes(xbytes, 'big')
 
 imap_url = "imap.gmail.com"
-user = "accttesting679@gmail.com"
-password = "Account testing her3"
+user = input("Insert sending email")
+password = input("Insert recieving email")
 M = imaplib.IMAP4_SSL(imap_url)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
