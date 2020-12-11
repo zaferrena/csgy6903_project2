@@ -13,8 +13,8 @@ def int_from_bytes(xbytes: bytes) -> int:
 
 smtp_server = "smtp.gmail.com"
 port = 587
-sender_email = "gavinjsenger@gmail.com"
-password = "Nyu12345!"
+sender_email = input("Input sending email: ")
+password = input("Input password: ")
 
 context = ssl.create_default_context()
 
