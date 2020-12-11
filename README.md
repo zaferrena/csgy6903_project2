@@ -14,3 +14,5 @@ Project by Gavin Senger and Zachary Ferrena.
 - Run both programs starting with server.py, then client.py when the server reaches the connnecting step. This can be done from the same computer using two different terminals or from two different computers.
 
 - Wait for the program to run entirely and make sure both sides finish before temrinating a connection (i.e. killing either program). The client side should end before the server side.
+
+- Occasionally an email may send without a body, this means that the program should be rerun.
