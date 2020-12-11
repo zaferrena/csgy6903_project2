@@ -37,7 +37,6 @@ peer_aes_public_key = peer_aes_public_numbers.public_key()
 
 aes_shared_key = aes_private_key.exchange(peer_aes_public_key)
 derived_aes_key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=b'test',).derive(aes_shared_key)
-print(derived_aes_key)
 
 nonce_private_key = parameters.generate_private_key()
 nonce_public_key = nonce_private_key.public_key()
@@ -51,7 +50,6 @@ peer_nonce_public_key = peer_nonce_public_numbers.public_key()
 
 nonce_shared_key = nonce_private_key.exchange(peer_nonce_public_key)
 derived_nonce_key = HKDF(algorithm=hashes.SHA256(), length=16, salt=None, info=b'test',).derive(nonce_shared_key)
-print(derived_nonce_key)
 
 s.recv(2048)
 time.sleep(20)
@@ -66,9 +64,9 @@ if result == 'OK':
         email_message = email.message_from_bytes(data[0][1])
         message = str(email_message.get_payload())
         decodedString = literal_eval("{}".format(message))
-        print(decodedString, type(decodedString))
         cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
         decryptor = cipher.decryptor()
         pt = decryptor.update(decodedString) + decryptor.finalize()
         print('Date:' + email_message['Date'])
-        print(pt.decode('utf-8'))
+        plaintext_str = pt.decode('latin-1')
+        print(plaintext_str)
