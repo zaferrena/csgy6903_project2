@@ -41,7 +41,6 @@ peer_aes_public_key = peer_aes_public_numbers.public_key()
 
 aes_shared_key = aes_private_key.exchange(peer_aes_public_key)
 derived_aes_key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=b'test',).derive(aes_shared_key)
-print(derived_aes_key)
 
 nonce_private_key = parameters.generate_private_key()
 nonce_public_key = nonce_private_key.public_key()
@@ -55,13 +54,11 @@ peer_nonce_public_key = peer_nonce_public_numbers.public_key()
 
 nonce_shared_key = nonce_private_key.exchange(peer_nonce_public_key)
 derived_nonce_key = HKDF(algorithm=hashes.SHA256(), length=16, salt=None, info=b'test',).derive(nonce_shared_key)
-print(derived_nonce_key)
 
 cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
 encryptor = cipher.encryptor()
-ct = encryptor.update(b'jdfkoasjfpoijpoilkfjdaspoifjdaspoijfiepwoijopqewjdfsoifjdsapoukfjlpkadjpsdaopikfdsajopifdsajopifdasjiopfdsajpoifsadj') + encryptor.finalize()
+ct = encryptor.update(b'Hello! Welcome to our demonstration. If you see this message, it worked!') + encryptor.finalize()
 message = str(ct)
-print(message)
 
 try:
     server = smtplib.SMTP(smtp_server, port)
