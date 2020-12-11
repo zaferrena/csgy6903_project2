@@ -1,5 +1,6 @@
 import socket
-import smtplib, ssl
+import imaplib, email, time
+from ast import literal_eval
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -11,12 +12,10 @@ def int_to_bytes(x: int) -> bytes:
 def int_from_bytes(xbytes: bytes) -> int:
     return int.from_bytes(xbytes, 'big')
 
-smtp_server = "smtp.gmail.com"
-port = 587
-sender_email = input("Input sending email: ")
-password = input("Input password: ")
-
-context = ssl.create_default_context()
+imap_url = "imap.gmail.com"
+user = "accttesting679@gmail.com"
+password = "Account testing her3"
+M = imaplib.IMAP4_SSL(imap_url)
 
 parameters = dh.generate_parameters(generator=2, key_size=2048)
 pn = parameters.parameter_numbers()
@@ -55,18 +54,21 @@ peer_nonce_public_key = peer_nonce_public_numbers.public_key()
 nonce_shared_key = nonce_private_key.exchange(peer_nonce_public_key)
 derived_nonce_key = HKDF(algorithm=hashes.SHA256(), length=16, salt=None, info=b'test',).derive(nonce_shared_key)
 
-cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
-encryptor = cipher.encryptor()
-ct = encryptor.update(b'Hello! Welcome to our demonstration. If you see this message, it worked!') + encryptor.finalize()
-message = str(ct)
-
-try:
-    server = smtplib.SMTP(smtp_server, port)
-    server.ehlo()
-    server.starttls(context=context)
-    server.ehlo()
-    server.login(sender_email, password)
-    server.sendmail(sender_email, "accttesting679@gmail.com", message)
-    clientsocket.send(b"Run")
-except Exception as e: print(e)
-finally: server.quit()
+clientsocket.recv(2048)
+time.sleep(20)
+M.login(user, password)
+M.select('Inbox')
+result, data = M.uid('search', None, "ALL")
+if result == 'OK':
+    num = data[0].split()[-1]
+    result, data = M.uid('fetch', num, '(RFC822)')
+    if result == 'OK':
+        email_message = email.message_from_bytes(data[0][1])
+        message = str(email_message.get_payload())
+        encodedString = literal_eval("{}".format(message))
+        cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
+        decryptor = cipher.decryptor()
+        pt = decryptor.update(encodedString) + decryptor.finalize()
+        print('Date:' + email_message['Date'])
+        plaintext_str = pt.decode('latin-1')
+        print(plaintext_str)
