@@ -63,7 +63,7 @@ if result == 'OK':
     if result == 'OK':
         email_message = email.message_from_bytes(data[0][1])
         message = str(email_message.get_payload())
-        decodedString = literal_eval("{}".format(message))
+        encodedString = literal_eval("{}".format(message))
         cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
         decryptor = cipher.decryptor()
         pt = decryptor.update(decodedString) + decryptor.finalize()
