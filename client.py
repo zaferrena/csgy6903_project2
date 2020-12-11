@@ -1,6 +1,5 @@
 import socket
-import imaplib, email, time
-from ast import literal_eval
+import smtplib, ssl
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import dh
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -12,10 +11,12 @@ def int_to_bytes(x: int) -> bytes:
 def int_from_bytes(xbytes: bytes) -> int:
     return int.from_bytes(xbytes, 'big')
 
-imap_url = "imap.gmail.com"
-user = input("Insert recieving email: ")
-password = input("Insert password: ")
-M = imaplib.IMAP4_SSL(imap_url)
+smtp_server = "smtp.gmail.com"
+port = 587
+sender_email = "gavinjsenger@gmail.com"
+password = "Nyu12345!"
+
+context = ssl.create_default_context()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((socket.gethostname(), 1234))
@@ -51,22 +52,18 @@ peer_nonce_public_key = peer_nonce_public_numbers.public_key()
 nonce_shared_key = nonce_private_key.exchange(peer_nonce_public_key)
 derived_nonce_key = HKDF(algorithm=hashes.SHA256(), length=16, salt=None, info=b'test',).derive(nonce_shared_key)
 
-s.recv(2048)
-time.sleep(20)
+cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
+encryptor = cipher.encryptor()
+ct = encryptor.update(b'Hello! Welcome to our demonstration. If you see this message, it worked!') + encryptor.finalize()
+message = str(ct)
 
-M.login(user, password)
-M.select('Inbox')
-result, data = M.uid('search', None, "ALL")
-if result == 'OK':
-    num = data[0].split()[-1]
-    result, data = M.uid('fetch', num, '(RFC822)')
-    if result == 'OK':
-        email_message = email.message_from_bytes(data[0][1])
-        message = str(email_message.get_payload())
-        encodedString = literal_eval("{}".format(message))
-        cipher = Cipher(algorithms.AES(derived_aes_key), modes.CTR(derived_nonce_key))
-        decryptor = cipher.decryptor()
-        pt = decryptor.update(encodedString) + decryptor.finalize()
-        print('Date:' + email_message['Date'])
-        plaintext_str = pt.decode('latin-1')
-        print(plaintext_str)
+try:
+    server = smtplib.SMTP(smtp_server, port)
+    server.ehlo()
+    server.starttls(context=context)
+    server.ehlo()
+    server.login(sender_email, password)
+    server.sendmail(sender_email, "accttesting679@gmail.com", message)
+    s.send(b"Run")
+except Exception as e: print(e)
+finally: server.quit()
